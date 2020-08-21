@@ -2,6 +2,8 @@
 
 add_action( 'admin_menu', 'gds_gardens_add_settings_page' );
 add_action( 'admin_init', 'gds_gardens_register_settings' );
+add_action( 'admin_post_garden_api_pull', 'garden_api_pull_request' );
+add_action( 'admin_post_garden_post_clear', 'garden_post_clear_request' );
 
 /**
  *  To add menu option in dashboard
@@ -40,6 +42,19 @@ function gds_gardens_register_settings() {
      register_setting( 'gds_geodatahub_gardens_options', 'gds_geodatahub_gardens_genset' );
 }
 
+function garden_api_pull_request() {
+  require_once dirname( __FILE__ ) . '/../partials/pullPostsFromAPI.php';
+	pull_gardens_from_geodatahub( GARDEN_API_URL . 'query?where=1%3D1&outFields=Name,GardenType,Description,Address,Directions,AvailablePlots,Accessible,GetInvolved,Email,Ownership,MaintainedBy,GlobalID,CommGardenID,OBJECTID&outSR=4326&f=json');
+}
+
+function garden_post_clear_request() {
+  $allposts= get_posts( array('post_type'=>'community-garden','numberposts'=>-1) );
+	foreach ($allposts as $eachpost) {
+	  wp_delete_post( $eachpost->ID, true );
+	}
+}
+
+
 /**
  *  To add settings page
  *
@@ -63,18 +78,6 @@ function gds_geodatahub_gardens_settings_page() {
                                       <?php settings_fields( 'gds_geodatahub_gardens_options' ); ?>
                                       <?php $gdsset = get_option( 'gds_geodatahub_gardens_genset' ); ?>
                                       <table class="form-table">
-                                        <tr valign="top"><th scope="row"><?php _e( 'URL of API (the bit before `query?`):', 'gds_geodatahub_gardens' ); ?></th>
-                                             <td>
-                                                 <?php $apiurl = ( isset( $gdsset['api_url'] ) ) ? $gdsset['api_url'] : 0; ?>
-                                                 <input id='gds_geodatahub_gardens_genset_api_url' name='gds_geodatahub_gardens_genset[api_url]' type='text' value='<?php echo $apiurl ?>' style='width:100%'/>
-                                             </td>
-                                         </tr>
-                                         <tr valign="top"><th scope="row"><?php _e( 'Slug of community gardens parent page (defaults to home):', 'gds_geodatahub_gardens' ); ?></th>
-                                              <td>
-                                                  <?php $archparent = ( isset( $gdsset['archive_parent'] ) ) ? $gdsset['archive_parent'] : blah; ?>
-                                                  <input id='gds_geodatahub_gardens_genset_archive_parent' name='gds_geodatahub_gardens_genset[archive_parent]' type='text' value='<?php echo $archparent ?>' style='width:100%'/>
-                                              </td>
-                                          </tr>
                                            <tr valign="top"><th scope="row"><?php _e( 'Show Garden Post-type on admin sidebar?', 'gds_geodatahub_gardens' ); ?></th>
                                                 <td>
                                                     <?php $selected = ( isset( $gdsset['menu_show'] ) ) ? $gdsset['menu_show'] : 0; ?>
@@ -82,11 +85,39 @@ function gds_geodatahub_gardens_settings_page() {
                                                     <input type="radio" name="gds_geodatahub_gardens_genset[menu_show]" value="0" <?php checked( $selected, 0 ); ?>><?php _e( 'No', 'gds_geodatahub_gardens' ); ?>
                                                 </td>
                                             </tr>
+                                            <tr valign="top"><th scope="row"><?php _e( 'Full width Garden Post Types?', 'gds_geodatahub_gardens' ); ?></th>
+                                                 <td>
+                                                     <?php $selected = ( isset( $gdsset['full_width'] ) ) ? $gdsset['full_width'] : 0; ?>
+                                                     <input type="radio" name="gds_geodatahub_gardens_genset[full_width]" value="1" <?php checked( $selected, 1 ); ?>><?php _e( 'Yes', 'gds_geodatahub_gardens' ); ?>&nbsp;&nbsp;
+                                                     <input type="radio" name="gds_geodatahub_gardens_genset[full_width]" value="0" <?php checked( $selected, 0 ); ?>><?php _e( 'No', 'gds_geodatahub_gardens' ); ?>
+                                                 </td>
+                                             </tr>
+                                             <tr valign="top"><th scope="row"><?php _e( 'Path of community gardens parent page (defaults to home):', 'gds_geodatahub_gardens' ); ?></th>
+                                                  <td>
+                                                      <?php $archparent = ( isset( $gdsset['archive_parent'] ) ) ? $gdsset['archive_parent'] : null; ?>
+                                                      <input id='gds_geodatahub_gardens_genset_archive_parent' name='gds_geodatahub_gardens_genset[archive_parent]' type='text' value='<?php echo $archparent ?>' style='width:100%'/>
+                                                  </td>
+                                              </tr>
+                                             <tr valign="top"><th scope="row"><?php _e( 'URL of API (the bit before `query?`):', 'gds_geodatahub_gardens' ); ?></th>
+                                                  <td>
+                                                      <?php $apiurl = ( isset( $gdsset['api_url'] ) ) ? $gdsset['api_url'] : null; ?>
+                                                      <input id='gds_geodatahub_gardens_genset_api_url' name='gds_geodatahub_gardens_genset[api_url]' type='text' value='<?php echo $apiurl ?>' style='width:100%'/>
+                                                  </td>
+                                              </tr>
                                       </table>
                                       <?php submit_button(); ?>
                                  </form>
                              </div>
                          </div>
+                         <form action="<?php echo admin_url('admin-post.php'); ?>" method="post">
+                           <input type="hidden" name="action" value="garden_post_clear">
+                           <input type="submit" class="button button-primary" value="Clear all Garden posts">
+                         </form><br/ >
+
+                         <form action="<?php echo admin_url('admin-post.php'); ?>" method="post">
+                           <input type="hidden" name="action" value="garden_api_pull">
+                           <input type="submit" class="button button-primary" value="Pull posts from GeoDataHub"><p><small style="color:grey;"> Please by patient, this can take a while</small></p>
+                         </form>
 
                     </div> <!-- end post-body-content -->
 

@@ -1,6 +1,6 @@
 <?php
-
-function garden_type_categories() {
+add_action( 'acf/register_fields', 'populate_garden_types' );
+function populate_garden_types() {
 
   // Define first level custom categories
   wp_insert_category(array(

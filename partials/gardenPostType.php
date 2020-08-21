@@ -1,13 +1,5 @@
 <?php
 
-/*
-* Pull options and store in easily accessible variables
-*/
-$gdsset = get_option( 'gds_geodatahub_gardens_genset' );
-define( 'GARDEN_MENU_SHOW', ( isset( $gdsset['menu_show'] ) ) ? $gdsset['menu_show'] : 0 );
-define( 'GARDEN_PARENT_PAGE_PATH', ( isset( $gdsset['archive_parent'] ) ) ? $gdsset['archive_parent'] : null );
-define( 'GARDEN_PARENT_PAGE_ID', get_page_by_path(GARDEN_PARENT_PAGE_PATH)->ID );
-
 /**
 * Create Custom Post Type for Gardens
 *
@@ -94,11 +86,31 @@ function saveGardenParent( $data, $postarr ) {
 
     if ( $post->post_type == "community-garden" ){
 	    $data['post_parent'] = GARDEN_PARENT_PAGE_ID;
-	}
+	   }
 
     return $data;
 }
 
+
+function wpdoc_flush_rules_on_save_posts( $post_id ) {
+    if ( ! empty( $_POST['community-garden']) && $_POST['post_type'] != 'post' ) {
+        return;
+    }
+
+    flush_rewrite_rules();
+}
+add_action( 'save_post', 'wpdoc_flush_rules_on_save_posts', 20, 2);
+
+
+add_filter('single_template', 'garden_geodatahub_single_template');
+function garden_geodatahub_single_template($template){
+    if ('community-garden' == get_post_type(get_queried_object_id())) {
+        // if you're here, you're on a singlar page for your costum post
+        // type and WP did NOT locate a template, use your own.
+        $template = plugin_dir_path( __FILE__ ) . '../page-templates/single-garden-geodatahub.php';
+    }
+    return $template;
+}
 
 
 
