@@ -11,6 +11,7 @@ function pull_gardens_from_geodatahub($api){
     $garden_post = array(
          'post_title'  => $post_title,
          'post_parent'  => GARDEN_PARENT_PAGE_ID,
+         'post_excerpt' => $feature->attributes->Description,
          'post_status' => 'publish',
          'post_type'   => 'community-garden',
     );
