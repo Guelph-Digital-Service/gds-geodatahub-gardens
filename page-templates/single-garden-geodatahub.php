@@ -4,6 +4,17 @@
  *
  */
 
+function checkRemoteFile($url){
+	$request = wp_remote_get($url);
+  if( is_wp_error( $request ) ) {	return false;}
+  $body = wp_remote_retrieve_body( $request );
+  $data = json_decode( $body );
+
+	if ($data->error->code === 404){return false;}
+	else{return true;}
+ }
+
+
 
 
 get_header(); ?>
@@ -18,9 +29,12 @@ get_header(); ?>
 							<h1 class="entry-title"><?php the_title(); ?></h1>
 						</header>
 
+
 						<div class="entry-content">
 
               <div class="bs-callout"><p>This page is generated using data from the <a href="https://cityofguelph.maps.arcgis.com/apps/opsdashboard/index.html#/b32c697c9cff4078b617afdac05189de">Community Gardens and Pollinator/Wildlife Gardens Map</a>, made available at the <a href="http://geodatahub-cityofguelph.opendata.arcgis.com">City of Guelph's GeoDataHub</a>.</div>
+
+							<?php the_content(); ?>
 
 							<?php if( get_field('garden_geodatahub_address') || get_field('garden_geodatahub_directions') ): ?>
 								<h2>Location</h2>
@@ -68,7 +82,13 @@ get_header(); ?>
 								<p>For more information, please email <a href="mailto:<?php the_field('garden_geodatahub_email'); ?>"> <?php the_field('garden_geodatahub_email'); ?></a></p>
 							<?php endif; ?>
 
-							<?php the_content(); ?>
+
+							<?php $images = get_field('garden_geodatahub_gallery', false, false);
+							if( $images ):
+								echo '<h2>Photo Gallery</h2>';
+								echo do_shortcode('[gallery size="large" columns="3" ids="'.implode(',',$images).'"]');
+							endif; ?>
+
 						</div><!-- .entry-content -->
 
 				<?php endwhile; // end of the loop. ?>

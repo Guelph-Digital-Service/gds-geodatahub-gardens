@@ -26,7 +26,8 @@ define( 'GDSGARDENS_OPTION', 'gds_geodatahub_gardens_settings' );
 define( 'GARDEN_MENU_SHOW', ( isset( $gdsset['menu_show'] ) ) ? $gdsset['menu_show'] : 0 );
 define( 'GARDEN_PARENT_PAGE_PATH', ( isset( $gdsset['archive_parent'] ) ) ? $gdsset['archive_parent'] : null );
 define( 'GARDEN_PARENT_PAGE_ID', get_page_by_path(GARDEN_PARENT_PAGE_PATH)->ID );
-define( 'GARDEN_API_URL', ( isset( $gdsset['api_url'] ) ) ? $gdsset['api_url'] : null );
+define( 'GARDEN_FIRST_API_URL', ( isset( $gdsset['api_url'] ) ) ? $gdsset['api_url'] : null );
+define( 'GARDEN_SECOND_API_URL', ( isset( $gdsset['second_api_url'] ) ) ? $gdsset['second_api_url'] : null );
 define( 'GARDEN_FULL_WIDTH', ( isset( $gdsset['full_width'] ) ) ? $gdsset['full_width'] : 0 );
 
 /**

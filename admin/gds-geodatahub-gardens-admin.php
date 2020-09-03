@@ -3,6 +3,7 @@
 add_action( 'admin_menu', 'gds_gardens_add_settings_page' );
 add_action( 'admin_init', 'gds_gardens_register_settings' );
 add_action( 'admin_post_garden_api_pull', 'garden_api_pull_request' );
+add_action( 'admin_post_garden_second_api_pull', 'garden_second_api_pull_request' );
 add_action( 'admin_post_garden_post_clear', 'garden_post_clear_request' );
 
 /**
@@ -42,17 +43,42 @@ function gds_gardens_register_settings() {
      register_setting( 'gds_geodatahub_gardens_options', 'gds_geodatahub_gardens_genset' );
 }
 
-function garden_api_pull_request() {
-  require_once dirname( __FILE__ ) . '/../partials/pullPostsFromAPI.php';
-	pull_gardens_from_geodatahub( GARDEN_API_URL . 'query?where=1%3D1&outFields=Name,GardenType,Description,Address,Directions,AvailablePlots,Accessible,GetInvolved,Email,Ownership,MaintainedBy,GlobalID,CommGardenID,OBJECTID&outSR=4326&f=json');
-}
-
 function garden_post_clear_request() {
   $allposts= get_posts( array('post_type'=>'community-garden','numberposts'=>-1) );
 	foreach ($allposts as $eachpost) {
 	  wp_delete_post( $eachpost->ID, true );
 	}
 }
+
+function garden_api_pull_request() {
+  require_once dirname( __FILE__ ) . '/../partials/pullPostsFromAPI.php';
+	pull_gardens_from_geodatahub( GARDEN_FIRST_API_URL . 'query?where=1%3D1&outFields=Name,GardenType,Description,Address,Directions,AvailablePlots,Accessible,GetInvolved,Email,Ownership,MaintainedBy,GlobalID,CommGardenID,OBJECTID&outSR=4326&f=json', 'https://services5.arcgis.com/k3dd78JyG9GFoZHG/arcgis/rest/services/CommunityGarden/FeatureServer/0/');
+}
+
+function garden_second_api_pull_request() {
+
+  require_once dirname( __FILE__ ) . '/../partials/pullPostsFromAPI.php';
+	pull_gardens_from_geodatahub( GARDEN_SECOND_API_URL . 'query?where=1%3D1&outFields=Name,GardenType,GardenDesc,Address,Accessible,Volunteer,InstallYear,Phone,Email,Ownership,MaintainedBy,GardenBedID, WLGardenID,OBJECTID&outSR=4326&f=json', 'https://services5.arcgis.com/k3dd78JyG9GFoZHG/arcgis/rest/services/CommunityGarden/FeatureServer/1/');
+}
+
+
+
+function wp_get_attachment_by_post_name( $post_name ) {
+        $args           = array(
+            'posts_per_page' => 1,
+            'post_type'      => 'attachment',
+            'name'           => trim( $post_name ),
+        );
+
+        $get_attachment = new WP_Query( $args );
+
+        if ( ! $get_attachment || ! isset( $get_attachment->posts, $get_attachment->posts[0] ) ) {
+            return false;
+        }
+
+        return $get_attachment->posts[0];
+}
+
 
 
 /**
@@ -98,12 +124,18 @@ function gds_geodatahub_gardens_settings_page() {
                                                       <input id='gds_geodatahub_gardens_genset_archive_parent' name='gds_geodatahub_gardens_genset[archive_parent]' type='text' value='<?php echo $archparent ?>' style='width:100%'/>
                                                   </td>
                                               </tr>
-                                             <tr valign="top"><th scope="row"><?php _e( 'URL of API (the bit before `query?`):', 'gds_geodatahub_gardens' ); ?></th>
+                                             <tr valign="top"><th scope="row"><?php _e( 'URL of first API (the bit before `query?`):', 'gds_geodatahub_gardens' ); ?></th>
                                                   <td>
                                                       <?php $apiurl = ( isset( $gdsset['api_url'] ) ) ? $gdsset['api_url'] : null; ?>
                                                       <input id='gds_geodatahub_gardens_genset_api_url' name='gds_geodatahub_gardens_genset[api_url]' type='text' value='<?php echo $apiurl ?>' style='width:100%'/>
                                                   </td>
                                               </tr>
+                                              <tr valign="top"><th scope="row"><?php _e( 'URL of second API:', 'gds_geodatahub_gardens' ); ?></th>
+                                                   <td>
+                                                       <?php $apiurl = ( isset( $gdsset['second_api_url'] ) ) ? $gdsset['second_api_url'] : null; ?>
+                                                       <input id='gds_geodatahub_gardens_genset_second_api_url' name='gds_geodatahub_gardens_genset[second_api_url]' type='text' value='<?php echo $apiurl ?>' style='width:100%'/>
+                                                   </td>
+                                               </tr>
                                       </table>
                                       <?php submit_button(); ?>
                                  </form>
@@ -112,12 +144,19 @@ function gds_geodatahub_gardens_settings_page() {
                          <form action="<?php echo admin_url('admin-post.php'); ?>" method="post">
                            <input type="hidden" name="action" value="garden_post_clear">
                            <input type="submit" class="button button-primary" value="Clear all Garden posts">
-                         </form><br/ >
+                         </form><br/ ><hr><br/>
 
                          <form action="<?php echo admin_url('admin-post.php'); ?>" method="post">
                            <input type="hidden" name="action" value="garden_api_pull">
-                           <input type="submit" class="button button-primary" value="Pull posts from GeoDataHub"><p><small style="color:grey;"> Please by patient, this can take a while</small></p>
+                           <input type="submit" class="button button-primary" value="Pull posts from first API">
+                         </form><br/ >
+
+                         <form action="<?php echo admin_url('admin-post.php'); ?>" method="post">
+                           <input type="hidden" name="action" value="garden_second_api_pull">
+                           <input type="submit" class="button button-primary" value="Pull posts from second API">
                          </form>
+
+                         <p><small style="color:grey;"> Please by patient, this can take a while</small></p>
 
                     </div> <!-- end post-body-content -->
 
