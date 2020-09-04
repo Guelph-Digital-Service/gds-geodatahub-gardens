@@ -27,7 +27,9 @@ define( 'GARDEN_MENU_SHOW', ( isset( $gdsset['menu_show'] ) ) ? $gdsset['menu_sh
 define( 'GARDEN_PARENT_PAGE_PATH', ( isset( $gdsset['archive_parent'] ) ) ? $gdsset['archive_parent'] : null );
 define( 'GARDEN_PARENT_PAGE_ID', get_page_by_path(GARDEN_PARENT_PAGE_PATH)->ID );
 define( 'GARDEN_FIRST_API_URL', ( isset( $gdsset['api_url'] ) ) ? $gdsset['api_url'] : null );
+define( 'GARDEN_FIRST_API_ATTACH_URL', 'https://services5.arcgis.com/k3dd78JyG9GFoZHG/arcgis/rest/services/CommunityGarden/FeatureServer/0/');
 define( 'GARDEN_SECOND_API_URL', ( isset( $gdsset['second_api_url'] ) ) ? $gdsset['second_api_url'] : null );
+define( 'GARDEN_SECOND_API_ATTACH_URL', GARDEN_SECOND_API_URL );
 define( 'GARDEN_FULL_WIDTH', ( isset( $gdsset['full_width'] ) ) ? $gdsset['full_width'] : 0 );
 
 /**

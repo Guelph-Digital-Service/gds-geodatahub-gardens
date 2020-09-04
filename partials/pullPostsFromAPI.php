@@ -1,13 +1,18 @@
 <?php
-function pull_gardens_from_geodatahub($api, $attach_baseurl){
+function pull_gardens_from_geodatahub($api_num, $api, $attach_baseurl){
   $request = wp_remote_get($api);
   if( is_wp_error( $request ) ) {	return false;}
   $body = wp_remote_retrieve_body( $request );
   $data = json_decode( $body );
   foreach ( $data->features as $feature ) {
 
-    $post_title = ucwords(strtolower($feature->attributes->Name));
-    $post_desc = ucwords(strtolower($feature->attributes->Description));
+    if ($api_num == 0){
+      $post_title = ucwords(strtolower($feature->attributes->Name));
+      $post_desc = ucwords(strtolower($feature->attributes->Description));
+    } else{
+      $post_title = ucwords(strtolower($feature->attributes->Name));
+      $post_desc = ucwords(strtolower($feature->attributes->GardenDesc));
+    }
 
     $garden_post = array(
          'post_title'  => $post_title,
@@ -34,9 +39,6 @@ function pull_gardens_from_geodatahub($api, $attach_baseurl){
     if (isset($feature->attributes->OBJECTID)) {
       update_field( 'garden_geodatahub_object_id', $feature->attributes->OBJECTID, $new_garden_post_id );
     }
-    if (isset($feature->attributes->AvailablePlots)) {
-      update_field( 'garden_geodatahub_available_plots', $feature->attributes->AvailablePlots, $new_garden_post_id );
-    }
     if (isset($feature->attributes->Accessible)) {
       update_field( 'garden_geodatahub_accessible', ucwords(strtolower($feature->attributes->Accessible)), $new_garden_post_id );
     }
@@ -52,26 +54,47 @@ function pull_gardens_from_geodatahub($api, $attach_baseurl){
     if (isset($feature->attributes->MaintainedBy)) {
       update_field( 'garden_geodatahub_maintained_by', ucwords(strtolower($feature->attributes->MaintainedBy)), $new_garden_post_id );
     }
+    if (isset($feature->attributes->AvailablePlots)) {
+      update_field( 'garden_geodatahub_available_plots', $feature->attributes->AvailablePlots, $new_garden_post_id );
+    }
     if (isset($feature->attributes->Directions)) {
       update_field( 'garden_geodatahub_directions', $feature->attributes->Directions, $new_garden_post_id );
     }
     if (isset($feature->attributes->GetInvolved)) {
       update_field( 'garden_geodatahub_get_involved', $feature->attributes->GetInvolved, $new_garden_post_id );
     }
-    if (isset($feature->attributes->Description)) {
-      update_field( 'garden_geodatahub_description', $feature->attributes->Description, $new_garden_post_id );
-    }
 
+    if ($api_num == 0){
+      if (isset($feature->attributes->Description)) {
+        update_field( 'garden_geodatahub_description', $feature->attributes->Description, $new_garden_post_id );
+      }
+    }
+    else{
+      if (isset($feature->attributes->GardenDesc)) {
+        update_field( 'garden_geodatahub_description', $feature->attributes->Description, $new_garden_post_id );
+      }
+    }
 
 
     if ($attach_baseurl){
       $image_url = $attach_baseurl . $feature->attributes->OBJECTID . '/attachments/';
 
-      for ($i=0; $i<31; $i++){
-        if (@getimagesize($image_url . $i)) {
+      $attachArray = array();
+      $attachRequest = wp_remote_get( $attach_baseurl . 'queryAttachments?objectIds=' . $feature->attributes->OBJECTID . '&globalIds=&definitionExpression=&attachmentTypes=&resultOffset=&resultRecordCount=&f=pjson');
+      if( is_wp_error( $attachRequest ) ) {	return false;}
+      $body = wp_remote_retrieve_body( $attachRequest );
+      $data = json_decode( $body );
+      foreach ( $data->attachmentGroups as $attachGroup ) {
+        foreach ( $attachGroup->attachmentInfos as $gardAttachment ) {
+          array_push($attachArray, $gardAttachment->id);
+        }
+      }
 
-          $desc = sanitize_title($post_title) . '-photo' . $i;
-          $wp_image_url = upload_image($image_url . $i, $feature->attributes->OBJECTID, $new_garden_post_id, $desc);
+      foreach ($attachArray as $attachID){
+        if (@getimagesize($image_url . $attachID)) {
+
+          $desc = sanitize_title($post_title) . '-photo' . $attachID;
+          $wp_image_url = upload_image($image_url . $attachID, $feature->attributes->OBJECTID, $new_garden_post_id, $desc);
           $attach_id = pippin_get_image_id($wp_image_url);
 
           $array = get_field('field_5f3fd9e0fb951', $new_garden_post_id, false);

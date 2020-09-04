@@ -32,7 +32,7 @@ get_header(); ?>
 
 						<div class="entry-content">
 
-              <div class="bs-callout"><p>This page is generated using data from the <a href="https://cityofguelph.maps.arcgis.com/apps/opsdashboard/index.html#/b32c697c9cff4078b617afdac05189de">Community Gardens and Pollinator/Wildlife Gardens Map</a>, made available at the <a href="http://geodatahub-cityofguelph.opendata.arcgis.com">City of Guelph's GeoDataHub</a>.</div>
+              <!-- <div class="bs-callout"><p>This page is generated using data from the <a href="https://cityofguelph.maps.arcgis.com/apps/opsdashboard/index.html#/b32c697c9cff4078b617afdac05189de">Community Gardens and Pollinator/Wildlife Gardens Map</a>, made available at the <a href="http://geodatahub-cityofguelph.opendata.arcgis.com">City of Guelph's GeoDataHub</a>.</div> -->
 
 							<?php the_content(); ?>
 

@@ -52,13 +52,14 @@ function garden_post_clear_request() {
 
 function garden_api_pull_request() {
   require_once dirname( __FILE__ ) . '/../partials/pullPostsFromAPI.php';
-	pull_gardens_from_geodatahub( GARDEN_FIRST_API_URL . 'query?where=1%3D1&outFields=Name,GardenType,Description,Address,Directions,AvailablePlots,Accessible,GetInvolved,Email,Ownership,MaintainedBy,GlobalID,CommGardenID,OBJECTID&outSR=4326&f=json', 'https://services5.arcgis.com/k3dd78JyG9GFoZHG/arcgis/rest/services/CommunityGarden/FeatureServer/0/');
+	pull_gardens_from_geodatahub( 0, GARDEN_FIRST_API_URL . 'query?where=1%3D1&outFields=*&outSR=4326&f=json', GARDEN_FIRST_API_ATTACH_URL);
 }
 
 function garden_second_api_pull_request() {
 
   require_once dirname( __FILE__ ) . '/../partials/pullPostsFromAPI.php';
-	pull_gardens_from_geodatahub( GARDEN_SECOND_API_URL . 'query?where=1%3D1&outFields=Name,GardenType,GardenDesc,Address,Accessible,Volunteer,InstallYear,Phone,Email,Ownership,MaintainedBy,GardenBedID, WLGardenID,OBJECTID&outSR=4326&f=json', 'https://services5.arcgis.com/k3dd78JyG9GFoZHG/arcgis/rest/services/CommunityGarden/FeatureServer/1/');
+	pull_gardens_from_geodatahub( 1, GARDEN_SECOND_API_URL . 'query?where=1%3D1&outFields=*&outSR=4326&f=json', GARDEN_FIRST_API_ATTACH_URL);
+
 }
 
 
