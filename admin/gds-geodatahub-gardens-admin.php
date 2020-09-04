@@ -58,7 +58,7 @@ function garden_api_pull_request() {
 function garden_second_api_pull_request() {
 
   require_once dirname( __FILE__ ) . '/../partials/pullPostsFromAPI.php';
-	pull_gardens_from_geodatahub( 1, GARDEN_SECOND_API_URL . 'query?where=1%3D1&outFields=*&outSR=4326&f=json', GARDEN_FIRST_API_ATTACH_URL);
+	pull_gardens_from_geodatahub( 1, GARDEN_SECOND_API_URL . 'query?where=1%3D1&outFields=*&outSR=4326&f=json', GARDEN_SECOND_API_ATTACH_URL);
 
 }
 
