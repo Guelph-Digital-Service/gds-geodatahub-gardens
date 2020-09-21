@@ -29,37 +29,3 @@ Version numbers will be given to major releases, where minor fixes and developme
 
 ## License
 Along with WordPress, this project is licensed under the GNU V3 General License.
-
-
-
-## KNOWN ISSUES
-
-**Database Schema Rules**
-Name: capitilzation? Currently cleansing on my side - problem
-GardenDesc: Automatic swap over
-*Status: ??
-*StatusDesc: ??
-*SharedUserAgreement: ??
-Address : Currently cleansing on my side
-Phone: cleansing
-Email: cleansing, single field or string?
-Ownership: Capitilization cleansing
-MaintainedBy: Capitilization cleansing
-Directions:
-GetInvolved:
-Description:
-
-
-
-- Capitilization of letters - If I do it, we lose abbreviation capitals
-- Multiple emails - clean on my side or database?
-
-- Addition of phone number field on site?
-- Addition of Install Year field on site?
-
-- Transition over to prod database
-
-**Database Contents**
-- Proper Description paragraph (RAW TEXT)
-- Proper Titles
--
